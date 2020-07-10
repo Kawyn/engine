@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head> </head>
+  <style>
+    * {
+      padding: 0px;
+      margin: 0px;
+      overflow: hidden;
+    }
+    canvas {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    #options {
+      position: absolute;
+
+      padding: 50px;
+      right: 0px;
+      width: 300px;
+      text-align: left;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+  </style>
+  <body>
+    <div id="options">
+      <span
+        >Pixelize:
+        <input
+          type="number"
+          id="pixel"
+          onchange="scaleeee=this.value; resizeCanvas();"
+        /> </span
+      ><br />
+      <span
+        >Edges:
+        <input type="checkbox" onchange="edges=this.checked;  " /> </span
+      ><br />
+      <span
+        >Light:
+        <input
+          type="checkbox"
+          checked="true"
+          onchange="lgt=this.checked;  "
+        /> </span
+      ><br />
+      <span
+        >Color in hex:
+        <input
+          type="text"
+          value="#fa432b"
+          onchange="clr=this.value;  "
+        /> </span
+      ><br />
+      <span
+        >bgcolor in hex:
+        <input
+          type="text"
+          value="#dadada"
+          onchange="skybox=this.value;  "
+        /> </span
+      ><br />
+    </div>
+    <canvas id="screen"> </canvas>
+    <script src="../vector.js"></script>
+    <script src="../matrix.js"></script>
+    <script src="../liblary.js"></script>
+    <script src="../engine.js"></script>
+    <script>
+      Scene.GameObjects = [
+        {
+          name: "fox",
+          mesh: Import(fox),
+          transform: {
+            position: new Vector3(0, 0, 5),
+          },
+          collider: new Vector3(0, 0, 0),
+        },
+      ];
+    </script>
+  </body>
+</html>
