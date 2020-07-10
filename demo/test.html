@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+  <head> </head>
+  <style>
+    * {
+      padding: 0px;
+      margin: 0px;
+      overflow: hidden;
+    }
+    canvas {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    #options {
+      position: absolute;
+
+      padding: 50px;
+      right: 0px;
+      width: 300px;
+      text-align: left;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #con {
+      height: 100vh;
+      width: 100%;
+      background-color: #0a0a0aaa;
+      padding-top: 20%;
+      position: absolute;
+      top: 0px;
+      text-align: center;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      opacity: 0;
+      font-size: 100px;
+    }
+  </style>
+  <body>
+    <canvas id="screen"> </canvas>
+    <script src="../vector.js"></script>
+    <script src="../matrix.js"></script>
+    <script src="../liblary.js"></script>
+    <script src="../engine.js"></script>
+    <script src="../player.js"></script>
+
+    <div id="con"> </div>
+    <script onload="">
+      var deathcount = 0;
+      skybox = "#696969";
+      edges = true;
+      camera.position = new Vector3(2.5, 5, 2.5);
+      Scene.GameObjects = [
+        {
+          name: "Abbys",
+          mesh: cube,
+          color: "#00000000",
+          display: false,
+
+          transform: {
+            position: new Vector3(-500, -20, -500),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(1000, 1, 1000),
+          },
+
+          collider: new Vector3(1000, 1, 1000),
+
+          onCollision: function () {
+            camera.position = new Vector3(2.5, 5, 2.5);
+            Yaw = 0;
+            deathcount++;
+
+            Scene.GameObjects[5].transform.position = new Vector3(11, 3, 17);
+            Scene.GameObjects[6].transform.position = new Vector3(15, 4, 17);
+            Scene.GameObjects[7].transform.position = new Vector3(19, 5, 17);
+          },
+        },
+        {
+          name: "Start",
+          mesh: cube,
+          color: "#ff8c00",
+
+          transform: {
+            position: new Vector3(0, 0, 0),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(5, 1, 5),
+          },
+
+          collider: new Vector3(5, 1, 5),
+
+          onCollision: function () {
+            // console.log('a');
+          },
+          onRefresh: function () {
+            // this.transform.position.x += 0.01;
+          },
+        },
+        {
+          name: "Platform1",
+          mesh: cube,
+          color: "#ff8c00",
+
+          transform: {
+            position: new Vector3(1.5, 1, 8),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+        },
+
+        {
+          name: "Platform2",
+          mesh: cube,
+          color: "#ff8c00",
+
+          transform: {
+            position: new Vector3(1.5, 1, 14),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+        },
+        {
+          name: "Platform3",
+          mesh: cube,
+          color: "#ff8c00",
+
+          transform: {
+            position: new Vector3(6, 2, 17),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+        },
+        {
+          name: "Platform4s",
+          mesh: cube,
+          color: "#ff8c0000",
+
+          transform: {
+            position: new Vector3(11, 3, 17),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+
+          onCollision: function () {
+            this.transform.position.y -= 0.03;
+            camera.position.y -= 0.03;
+          },
+        },
+        {
+          name: "Platform5",
+          mesh: cube,
+          color: "#ff8c0000",
+
+          transform: {
+            position: new Vector3(15, 4, 17),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+
+          onCollision: function () {
+            this.transform.position.y -= 0.03;
+            camera.position.y -= 0.03;
+          },
+        },
+        {
+          name: "Platform6",
+          mesh: cube,
+          color: "#ff8c0000",
+
+          transform: {
+            position: new Vector3(19, 5, 17),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+
+          onCollision: function () {
+            this.transform.position.y -= 0.03;
+            camera.position.y -= 0.03;
+          },
+        },
+        {
+          name: "Platform6",
+          mesh: cube,
+          color: "#ff8c00",
+
+          transform: {
+            position: new Vector3(22, 5, 12),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+        },
+        {
+          name: "Platform7",
+          mesh: cube,
+          color: "#ff8c00",
+
+          transform: {
+            position: new Vector3(22, 6, 7),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+        },
+        {
+          name: "Platform7",
+          mesh: cube,
+          color: "#8caa00",
+
+          transform: {
+            position: new Vector3(26, 7, 7),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 4),
+          },
+
+          collider: new Vector3(2, 0.5, 4),
+
+          way: false,
+          onRefresh() {
+            if (!this.way) {
+              this.transform.position.z += 0.05;
+              if (this.transform.position.z >= 20) {
+                this.way = true;
+              }
+            } else {
+              this.transform.position.z -= 0.05;
+              if (this.transform.position.z <= 6) {
+                this.way = false;
+              }
+            }
+          },
+        },
+        {
+          name: "Platform12",
+          mesh: cube,
+          color: "#ff8c00",
+
+          transform: {
+            position: new Vector3(30, 7, 20),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+        },
+
+        //left right
+        {
+          name: "Platform7",
+          mesh: cube,
+          color: "#8caa00",
+
+          transform: {
+            position: new Vector3(34, 7, 25),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 4),
+          },
+
+          collider: new Vector3(2, 0.5, 4),
+
+          way: false,
+          onRefresh() {
+            if (!this.way) {
+              this.transform.position.z += 0.05;
+              if (this.transform.position.z >= 25) {
+                this.way = true;
+              }
+            } else {
+              this.transform.position.z -= 0.05;
+              if (this.transform.position.z <= 13) {
+                this.way = false;
+              }
+            }
+          },
+        },
+        {
+          name: "Platform7",
+          mesh: cube,
+          color: "#8caa00",
+
+          transform: {
+            position: new Vector3(38, 7, 13),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 4),
+          },
+
+          collider: new Vector3(2, 0.5, 4),
+
+          way: false,
+          onRefresh() {
+            if (!this.way) {
+              this.transform.position.z += 0.05;
+              if (this.transform.position.z >= 25) {
+                this.way = true;
+              }
+            } else {
+              this.transform.position.z -= 0.05;
+              if (this.transform.position.z <= 13) {
+                this.way = false;
+              }
+            }
+          },
+        },
+        {
+          name: "Platform7",
+          mesh: cube,
+          color: "#8caa00",
+
+          transform: {
+            position: new Vector3(42, 7, 25),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 4),
+          },
+
+          collider: new Vector3(2, 0.5, 4),
+
+          way: false,
+          onRefresh() {
+            if (!this.way) {
+              this.transform.position.z += 0.05;
+              if (this.transform.position.z >= 25) {
+                this.way = true;
+              }
+            } else {
+              this.transform.position.z -= 0.05;
+              if (this.transform.position.z <= 13) {
+                this.way = false;
+              }
+            }
+          },
+        },
+        {
+          name: "Platform12",
+          mesh: cube,
+          color: "#ff8c00",
+
+          transform: {
+            position: new Vector3(46, 7, 20),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+        },
+        {
+          name: "Ending",
+          mesh: cube,
+          color: "#008caa",
+
+          transform: {
+            position: new Vector3(50, 7, 20),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(2, 1, 2),
+          },
+
+          collider: new Vector3(2, 0.5, 2),
+
+          onCollision: function () {
+            document.getElementById("con").style.opacity = 1;
+            document.getElementById("con").innerHTML =
+              `
+            Udało Ci się dotrzeć na sam koniec!!!<br />
+      Spadłeś tylko ` +
+              deathcount +
+              ` razy.`;
+          },
+        },
+      ];
+    </script>
+  </body>
+</html>

@@ -78,7 +78,7 @@ function Matrix_MultiplyMatrix(m1, m2) {
 
 
 
-const cube =
+const cubee =
     [
         new Polygon([new Vector3(0, 0, 0), new Vector3(0, 2, 0), new Vector3(1, 2, 0)]),
         new Polygon([new Vector3(0, 0, 0), new Vector3(1, 2, 0), new Vector3(1, 0, 0)]),
@@ -100,7 +100,7 @@ const cube =
     ];
 
 
-const cubee =
+const cube =
     [
         new Polygon([new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 0)]),
         new Polygon([new Vector3(0, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 0, 0)]),
@@ -154,10 +154,47 @@ const map = [
 // Labirynt
 
 const Scene = {
-    GameObjects: [
+    GameObjects: [{
+        name: 'Start',
+        mesh: cube,
+        color: '#dadada',
+
+        transform: {
+            position: new Vector3(0, 0, 1),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(1, 1, 1)
+        },
+
+        collider: new Vector3(1, 2, 1),
+
+        onCollision: function () {
+            // console.log('a');
+        },
+        onRefresh: function () {
+            // this.transform.position.x += 0.01;
+        },
+    },
+    {
+        name: 'Floor',
+        mesh: cubee,
+        color: '#ffaaff',
+
+        transform: {
+            position: new Vector3(-50, -3, -50),
+            rotation: new Vector3(0, 0, 0),
+            scale: new Vector3(100, 1, 100)
+        },
+
+        collider: new Vector3(100, 1, 100),
+
+        onCollision: function () {
+            // console.log('a');
+        },
+        onRefresh: function () {
+        },
+    }
     ]
 };
-
 
 
 
@@ -168,7 +205,7 @@ const Scene = {
 const light = new Vector3(0, 1, -1);
 var time = 0;
 const camera = {
-    position: new Vector3(1.5, 1, -3),
+    position: new Vector3(1.5, 2, 1),
     rotation: new Vector3(0, 0, 0)
 };
 
@@ -176,62 +213,7 @@ const camera = {
 let matProj = Matrix_MakeProjection(fov, aspectRatio, 0.1, 1000);
 
 let Yaw = 0;
-document.addEventListener("keydown", (event) => {
 
-
-    if (event.key == "w") {
-        movement.position.x = 1;
-    }
-    if (event.key == "s") {
-        movement.position.x = -1;
-    }
-    if (event.key == "d") {
-        movement.rotation.y = 0.01;
-    }
-    if (event.key == "a") {
-        movement.rotation.y = - 0.01;
-    }
-
-    if (event.keyCode == 40) {
-        movement.rotation.z = -0.01;
-    }
-    if (event.keyCode == 38) {
-        movement.rotation.z = 0.01;
-    }
-
-    if (event.key == ' ') {
-        camera.position.y += 0.1;
-    }
-    if (event.key == 'Control') {
-        camera.position.y -= 0.1;
-    }
-});
-document.addEventListener("keyup", (event) => {
-    if (event.key == "w") {
-        if (movement.position.x == 1)
-            movement.position.x = 0;
-    }
-    if (event.key == "s") {
-        if (movement.position.x == -1)
-            movement.position.x = 0;
-    }
-    if (event.key == "d") {
-        if (movement.rotation.y == 0.01)
-            movement.rotation.y = 0;
-    }
-    if (event.key == "a") {
-        if (movement.rotation.y == -0.01)
-            movement.rotation.y = 0;
-    }
-
-
-    if (event.keyCode == 40) {
-        movement.rotation.z = 0;
-    }
-    if (event.keyCode == 38) {
-        movement.rotation.z = 0;
-    }
-})
 let rotate = false;
 const movement = {
     position: new Vector3(),
@@ -240,22 +222,60 @@ const movement = {
 let lgt = true;
 let clr = '#fa432b'
 const player = {
-    rotationSpeed: 2.25,
-    movementSpeed: 0.05,
+    rotationSpeed: 4,
+    movementSpeed: 0.1,
 }
 let Xaw = 0;
+
+
+
+
+
+
+
+let gravity = true;
+let grounded = false;
+let gravityforce = 0.981;
+
+let fallForce = 0;
 let acda = setInterval(() => {
 
+
+    if (gravity)
+        grounded = false;
     const vForward = Vectors.Scale(camera.rotation, movement.position.x * player.movementSpeed);
     let oldcam = camera.position.Copy();
     camera.position = Vectors.Sum(camera.position, vForward);
-    Scene.GameObjects.forEach(gameObject => {
-        if (Vectors.isBetween(camera.position, gameObject.transform.position, Vectors.Sum(gameObject.transform.position, gameObject.collider))) {
+    Scene.GameObjects.forEach(GameObject => {
+        if (Vectors.isBetween(camera.position, GameObject.transform.position, Vectors.Sum(GameObject.transform.position, GameObject.collider))) {
             camera.position = oldcam;
-            console.log('a');
-            return;
+
+            if (GameObject.hasOwnProperty('onCollision')) {
+                GameObject.onCollision();
+            }
+        }
+
+        if (Vectors.isBetween(Vectors.Sum(camera.position, new Vector3(0, -gravityforce - 0.5, 0)), GameObject.transform.position, Vectors.Sum(GameObject.transform.position, GameObject.collider))) {
+            grounded = true;
+            if (GameObject.hasOwnProperty('onCollision')) {
+                GameObject.onCollision();
+            }
         }
     });
+
+    if (fallForce <= 0) {
+        if (!grounded) {
+            fallForce -= gravityforce * 0.01;
+            camera.position.y += fallForce;
+        }
+        else {
+            fallForce = 0;
+
+        }
+    } else {
+        fallForce -= gravityforce * 0.01;
+        camera.position.y += fallForce;
+    }
 
     Yaw += movement.rotation.y * player.rotationSpeed;
     /* if (Xaw + movement.rotation.z < 1.5 && Xaw + movement.rotation.z > -1.5)
@@ -264,11 +284,7 @@ let acda = setInterval(() => {
 
     if (rotate)
         time += 0.02;
-    let matRotZ = new Matrix4x4();
-    let matRotX = new Matrix4x4();
 
-    matRotZ.RotateZ(time * 0.5);
-    matRotX.RotateX(time);
 
 
 
@@ -296,23 +312,43 @@ let acda = setInterval(() => {
     let triangles = [];
     Scene.GameObjects.forEach(GameObject => {
 
+
+
+        if (GameObject.hasOwnProperty('onRefresh')) {
+            GameObject.onRefresh();
+        }
+
+        if (GameObject.hasOwnProperty('display'))
+            return;
+
         let matTrans = new Matrix4x4();
         matTrans.Translate(GameObject.transform.position.x, GameObject.transform.position.y, GameObject.transform.position.z);
 
+        let matRotZ = new Matrix4x4();
+        let matRotX = new Matrix4x4();
+        let matRotY = new Matrix4x4();
 
+        matRotZ.RotateZ(GameObject.transform.rotation.z * Math.PI / 180);
+        matRotX.RotateX(GameObject.transform.rotation.x * Math.PI / 180);
+        matRotY.RotateY(GameObject.transform.rotation.y * Math.PI / 180);
         let matWorld = new Matrix4x4();
         matWorld.CreateIdentity();
         matWorld = Matrix_MultiplyMatrix(matRotX, matRotZ);
+        matWorld = Matrix_MultiplyMatrix(matWorld, matRotY);
         matWorld = Matrix_MultiplyMatrix(matWorld, matTrans);
 
         GameObject.mesh.forEach(triangle => {
 
             let transformed = new Polygon();
             let viewed = new Polygon();
+            let scaled = new Polygon();
 
-            transformed.vertices[0] = Matrixes.MultiplyVector(matWorld, triangle.vertices[0]);
-            transformed.vertices[1] = Matrixes.MultiplyVector(matWorld, triangle.vertices[1]);
-            transformed.vertices[2] = Matrixes.MultiplyVector(matWorld, triangle.vertices[2]);
+            scaled.vertices[0] = Vectors.Multiply(triangle.vertices[0], GameObject.transform.scale);
+            scaled.vertices[1] = Vectors.Multiply(triangle.vertices[1], GameObject.transform.scale);
+            scaled.vertices[2] = Vectors.Multiply(triangle.vertices[2], GameObject.transform.scale);
+            transformed.vertices[0] = Matrixes.MultiplyVector(matWorld, scaled.vertices[0]);
+            transformed.vertices[1] = Matrixes.MultiplyVector(matWorld, scaled.vertices[1]);
+            transformed.vertices[2] = Matrixes.MultiplyVector(matWorld, scaled.vertices[2]);
 
 
             const line1 = Vectors.Sub(transformed.vertices[1], transformed.vertices[0]);
@@ -330,7 +366,7 @@ let acda = setInterval(() => {
                     let nlight = new Vector3(-1, 2, -2);
                     nlight.Normalize();
 
-                    const dp = Math.max(0.01, Vectors.Dot(nlight, normal));
+                    const dp = Math.max(0.5, Vectors.Dot(nlight, normal));
 
 
                     let brightness = Math.round(dp * 255);
@@ -339,6 +375,8 @@ let acda = setInterval(() => {
                 }
                 else
                     viewed.color = clr;
+
+                viewed.color = GameObject.color;
                 viewed.vertices[0] = Matrixes.MultiplyVector(matView, transformed.vertices[0]);
                 viewed.vertices[1] = Matrixes.MultiplyVector(matView, transformed.vertices[1]);
                 viewed.vertices[2] = Matrixes.MultiplyVector(matView, transformed.vertices[2]);
